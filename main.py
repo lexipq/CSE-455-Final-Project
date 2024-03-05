@@ -30,6 +30,12 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--transform', default='basic',
                         help='How do you want to transform your input data?')
     parser.add_argument(
+        '-l',
+        '--layers',
+        nargs='+',
+        help='Definition for the Convolutional Neural Network',
+        required=False)
+    parser.add_argument(
         '-d',
         '--dropout',
         default=False,
@@ -56,7 +62,6 @@ if __name__ == "__main__":
     
     if torch.cuda.is_available():
         torch.cuda.manual_seed(1)
-    
     
     if args.model == "RN-18":
         net_model = model.ResNet_18()

@@ -28,3 +28,33 @@ class SimpleCNN(nn.Module):
         x = x.reshape(batch_size, self.fc1.in_features)
         x = self.fc1(x)
         return x
+
+class DeepCNN(nn.Module):
+    def __init__(self, arr=[]):
+        super(DeepCNN, self).__init__()
+        in_channels = 3
+        # size of the input image
+        out_size = 256
+        self.layers = nn.Sequential()
+        for val in arr:
+            if isinstance(val, int):
+                # each convolutional layer we decrease the output size by 2
+                # for kernel size 3
+                out_size -= 2
+                self.layers.append(nn.Conv2d(in_channels, val, 3))
+                self.layers.append(nn.ReLU())
+                # input channels are now the output channels
+                in_channels = val
+            elif isinstance(val, str) and val == "pool":
+                # we floor divide the output size by 2 when we add a maxpool layer
+                out_size //= 2
+                self.layers.append(nn.MaxPool2d(2))
+        # fully connected layer at the end
+        self.fcl = nn.Linear(in_channels * out_size * out_size, 5)
+
+    def forward(self, x):
+        batch_size = x.shape[0]
+        x = self.layers(x)
+        x = x.reshape(batch_size, self.fcl.in_features)
+        x = self.fcl(x)
+        return x
