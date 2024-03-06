@@ -1,0 +1,4 @@
+# all dot files
+.*
+# all pycache files
+__*
