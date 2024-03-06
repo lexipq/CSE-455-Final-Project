@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-m',
         '--model',
-        default='SimpleCNN',
+        default='RN-18',
         help='The Model you want to use')
     parser.add_argument('-t', '--transform', default='basic',
                         help='How do you want to transform your input data?')
