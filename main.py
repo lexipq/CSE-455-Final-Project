@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-m',
         '--model',
-        default='RN-18',
+        default='SimpleCNN',
         help='The Model you want to use')
     parser.add_argument('-t', '--transform', default='basic',
                         help='How do you want to transform your input data?')
@@ -63,9 +63,9 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         torch.cuda.manual_seed(1)
     
-    if args.model == "RN-18":
+    if args.model == "RN18":
         net_model = model.ResNet_18()
-    elif args.model == "RN-34":
+    elif args.model == "RN34":
         net_model = model.ResNet_34()
     elif args.model == "SimpleCNN":
         net_model = model.SimpleCNN()
