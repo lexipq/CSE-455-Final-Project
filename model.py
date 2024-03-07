@@ -8,24 +8,24 @@ import torch.optim as optim
 
 from torchvision import transforms
 
-basic_transformer = transforms.Compose([transforms.Resize((100,100)), transforms.ToTensor()])
+basic_transformer = transforms.Compose([transforms.Resize((150,150)), transforms.ToTensor()])
 
 class SimpleCNN(nn.Module):
     def __init__(self, arr=[]):
         super(SimpleCNN, self).__init__()
-        # images are 100x100x3
+        # images are 150x150x3
         self.conv_layer = nn.Conv2d(3, 8, 3)
-        # after convolutional layer 49x49x8
+        # after convolutional layer 148x148x8
         self.pool = nn.MaxPool2d(2)
-        # afer one maxpool layer 49x49x8
-        self.fc1 = nn.Linear(49*49*8, 525)
+        # afer one maxpool layer 74x74x8
+        self.fc1 = nn.Linear(74*74*8, 250)
 
     def forward(self, x):
         batch_size = x.shape[0]
         x = self.conv_layer(x)
         x = F.relu(x)
         x = self.pool(x)
-        x = x.reshape(batch_size, 49*49*8)
+        x = x.reshape(batch_size, 74*74*8)
         x = self.fc1(x)
         return x
 
@@ -34,7 +34,7 @@ class DeepCNN(nn.Module):
         super(DeepCNN, self).__init__()
         in_channels = 3
         # size of the input image
-        out_size = 100
+        out_size = 150
         self.layers = nn.Sequential()
         for val in arr:
             if isinstance(val, int):
@@ -50,7 +50,7 @@ class DeepCNN(nn.Module):
                 out_size //= 2
                 self.layers.append(nn.MaxPool2d(2))
         # fully connected layer at the end
-        self.fcl = nn.Linear(in_channels * out_size * out_size, 525)
+        self.fcl = nn.Linear(in_channels * out_size * out_size, 250)
 
     def forward(self, x):
         batch_size = x.shape[0]
@@ -73,7 +73,7 @@ class ResNet_18(nn.Module):
         self.conv5 = nn.Sequential(ResBlock(256, 512, 2), ResBlock(512, 512, 2))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512, 260)
+        self.fc = nn.Linear(512, 250)
 
     def forward(self, x):
         batch_size = x.size(0)

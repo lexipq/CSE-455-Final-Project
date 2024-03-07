@@ -12,7 +12,7 @@ cnn = torch.load("RN18.pt")
 cnn.eval()
 
 data = loader.ImgDataSet("test.csv", transformer=model.basic_transformer)
-dataloader = torch.utils.data.DataLoader(data, batch_size=32)
+dataloader = torch.utils.data.DataLoader(data, batch_size=32, shuffle=True)
 
 predictions = []
 actual_labels = []
