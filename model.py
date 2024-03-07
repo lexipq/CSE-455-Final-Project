@@ -8,24 +8,24 @@ import torch.optim as optim
 
 from torchvision import transforms
 
-basic_transformer = transforms.Compose([transforms.Resize((224,224)), transforms.ToTensor()])
+basic_transformer = transforms.Compose([transforms.Resize((100,100)), transforms.ToTensor()])
 
 class SimpleCNN(nn.Module):
     def __init__(self, arr=[]):
         super(SimpleCNN, self).__init__()
-        # images are 224x224x3
+        # images are 100x100x3
         self.conv_layer = nn.Conv2d(3, 8, 3)
-        # after convolutional layer 222x222x8
+        # after convolutional layer 49x49x8
         self.pool = nn.MaxPool2d(2)
-        # afer one maxpool layer 111x111x8
-        self.fc1 = nn.Linear(111*111*8, 525)
+        # afer one maxpool layer 49x49x8
+        self.fc1 = nn.Linear(49*49*8, 525)
 
     def forward(self, x):
         batch_size = x.shape[0]
         x = self.conv_layer(x)
         x = F.relu(x)
         x = self.pool(x)
-        x = x.reshape(batch_size, 111*111*8)
+        x = x.reshape(batch_size, 49*49*8)
         x = self.fc1(x)
         return x
 
@@ -34,7 +34,7 @@ class DeepCNN(nn.Module):
         super(DeepCNN, self).__init__()
         in_channels = 3
         # size of the input image
-        out_size = 224
+        out_size = 100
         self.layers = nn.Sequential()
         for val in arr:
             if isinstance(val, int):
@@ -73,7 +73,7 @@ class ResNet_18(nn.Module):
         self.conv5 = nn.Sequential(ResBlock(256, 512, 2), ResBlock(512, 512, 2))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512, 525)
+        self.fc = nn.Linear(512, 260)
 
     def forward(self, x):
         batch_size = x.size(0)
