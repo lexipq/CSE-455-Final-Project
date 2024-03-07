@@ -8,7 +8,7 @@ import torch.optim as optim
 
 from torchvision import transforms
 
-basic_transformer = transforms.Compose([transforms.ToTensor()])
+basic_transformer = transforms.Compose([transforms.Resize((224,224)), transforms.ToTensor()])
 
 class SimpleCNN(nn.Module):
     def __init__(self, arr=[]):
@@ -18,7 +18,7 @@ class SimpleCNN(nn.Module):
         # after convolutional layer 222x222x8
         self.pool = nn.MaxPool2d(2)
         # afer one maxpool layer 111x111x8
-        self.fc1 = nn.Linear(111*111*8, 5)
+        self.fc1 = nn.Linear(111*111*8, 525)
 
     def forward(self, x):
         batch_size = x.shape[0]
@@ -50,7 +50,7 @@ class DeepCNN(nn.Module):
                 out_size //= 2
                 self.layers.append(nn.MaxPool2d(2))
         # fully connected layer at the end
-        self.fcl = nn.Linear(in_channels * out_size * out_size, 5)
+        self.fcl = nn.Linear(in_channels * out_size * out_size, 525)
 
     def forward(self, x):
         batch_size = x.shape[0]
@@ -73,7 +73,7 @@ class ResNet_18(nn.Module):
         self.conv5 = nn.Sequential(ResBlock(256, 512, 2), ResBlock(512, 512, 2))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512, 5)
+        self.fc = nn.Linear(512, 525)
 
     def forward(self, x):
         batch_size = x.size(0)

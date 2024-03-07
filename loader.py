@@ -5,7 +5,6 @@ import torch.utils.data
 import pandas as pd
 from PIL import Image
 
-
 class ImgDataSet(torch.utils.data.Dataset):
     def __init__(self, csvname, transformer=None):
         self.csvname = csvname
@@ -29,8 +28,8 @@ class ImgDataSet(torch.utils.data.Dataset):
 
 
 def get_data_loader(train_transformer, valid_transformer, batch_size=32):
-    train_dataset = ImgDataSet("../Birds_25/train.csv", transformer=train_transformer)
-    valid_dataset = ImgDataSet("../Birds_25/valid.csv", transformer=valid_transformer)
+    train_dataset = ImgDataSet("../Birds_525/train.csv", transformer=train_transformer)
+    valid_dataset = ImgDataSet("../Birds_525/valid.csv", transformer=valid_transformer)
 
     # Note: You can change the batch_size below depends on your hardware
     # If you are using a CPU or Laptop, the bacth size should be below 50
