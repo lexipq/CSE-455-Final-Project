@@ -109,6 +109,7 @@ class ResBlock(nn.Module):
         self.bn = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
         # save identity value
@@ -121,7 +122,7 @@ class ResBlock(nn.Module):
 
         # second layer
         out = self.conv2(out)
-        out = self.bn(out)
+        out = self.bn2(out)
 
         # paper starts downsampling from conv3_1
         if self.downsample is not None:
