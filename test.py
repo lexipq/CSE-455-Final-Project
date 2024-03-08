@@ -43,7 +43,7 @@ def process_image():
     name: {ndf.loc[predicted,'class']}"""
     label_var.set(value=val)
 
-cnn = torch.load("RN18.pt")
+cnn = torch.load("models/RN18.pt")
 cnn.eval()
     
 # randomly shuffle the indicies for the images in the csv file
@@ -51,8 +51,8 @@ num_of_images = 1250
 idxs = [x for x in range(0, num_of_images)]
 random.shuffle(idxs)
 
-df = pd.read_csv('test.csv')
-ndf = pd.read_csv('names.csv')
+df = pd.read_csv('csv_files/test.csv')
+ndf = pd.read_csv('csv_files/names.csv')
 count = 0
 
 window = tk.Tk()
