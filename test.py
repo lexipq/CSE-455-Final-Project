@@ -58,20 +58,21 @@ count = 0
 window = tk.Tk()
 window.geometry('500x400')
 
+# image to display, none for now
+img_tk = None
 canvas = tk.Canvas(height=224, width=224)
 img_id = canvas.create_image(0, 0, anchor='nw')
 canvas.pack()
 
-# random initial image
-img_tk = None
 label_var = tk.StringVar()
-process_image()
-
 label = tk.Label(textvariable=label_var)
 label.pack()
 
 button = tk.Button(text='new image', command=process_image)
 button.pack()
+
+# update images and labels for first prediction
+process_image()
 
 window.mainloop()
 
