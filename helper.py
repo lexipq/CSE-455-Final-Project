@@ -1,11 +1,8 @@
 # modified copy of hw5's helper.py
 import torch
-import torchvision.transforms as transforms
-import torch.optim as optim
 import torch.nn as nn
-
-import tqdm
 import numpy as np
+import tqdm
 
 
 def run(mode, dataloader, model, optimizer=None, use_cuda = True):

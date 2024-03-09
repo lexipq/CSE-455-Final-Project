@@ -1,11 +1,6 @@
 # code for the model
-import pdb
-
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-
 from torchvision import transforms
 
 basic_transformer = transforms.Compose([transforms.Resize((150,150)), transforms.ToTensor()])
