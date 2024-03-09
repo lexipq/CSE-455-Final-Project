@@ -12,6 +12,14 @@ from matplotlib import pyplot as plt
 import model
 import loader
 
+
+# boolean for if you want to use mps to speed things up
+want_to_use = False
+use_mps = torch.backends.mps.is_available() and want_to_use
+
+if use_mps:
+        mps_device = torch.device("mps")
+
 def process_image():
     global img_tk
     global count
@@ -33,6 +41,9 @@ def process_image():
     # turn the image into a 4D tensor
     input = model.basic_transformer(img)
     input = torch.unsqueeze(input, 0)
+
+    if use_mps:
+        input = input.to(mps_device)
 
     # pass it through the network
     outputs = cnn(input)
@@ -79,26 +90,29 @@ process_image()
 
 window.mainloop()
 
-# code to test training accuracy
-data = loader.ImgDataSet("csv_files/test.csv", transformer=model.basic_transformer)
-dataloader = torch.utils.data.DataLoader(data, batch_size=32, shuffle=True)
+# # code to test training accuracy
+# data = loader.ImgDataSet("csv_files/test.csv", transformer=model.basic_transformer)
+# dataloader = torch.utils.data.DataLoader(data, batch_size=32, shuffle=True)
 
-predictions = []
-actual_labels = []
+# predictions = []
+# actual_labels = []
 
-for inputs, labels in tqdm.tqdm(dataloader):
-        outputs = cnn(inputs)
-        _, pred = torch.max(outputs, dim=1)
-        actual_labels += labels.view(-1).cpu().numpy().tolist()
-        predictions += pred.view(-1).cpu().numpy().tolist()
+# for inputs, labels in tqdm.tqdm(dataloader):
+#         if use_mps:
+#                 inputs = inputs.to(mps_device)
+#                 labels = labels.to(mps_device)
+#         outputs = cnn(inputs)
+#         _, pred = torch.max(outputs, dim=1)
+#         actual_labels += labels.view(-1).cpu().numpy().tolist()
+#         predictions += pred.view(-1).cpu().numpy().tolist()
 
-acc = np.sum(np.array(actual_labels) == np.array(
-        predictions)) / len(actual_labels)
-print("testing accuracy:", (acc * 100))
+# acc = np.sum(np.array(actual_labels) == np.array(
+#         predictions)) / len(actual_labels)
+# print("testing accuracy:", (acc * 100))
 
-# code for plotting visualization window (still work in progress)
-plt.xlabel('predicted label')
-plt.ylabel('actual label')
-plt.title(f"testing accuracy: {(acc * 100)}%")
-plt.scatter(predictions, actual_labels)
-plt.show()
+# # code for plotting visualization window (still work in progress)
+# plt.xlabel('predicted label')
+# plt.ylabel('actual label')
+# plt.title(f"testing accuracy: {(acc * 100)}%")
+# plt.scatter(predictions, actual_labels)
+# plt.show()

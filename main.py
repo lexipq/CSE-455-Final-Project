@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import torch
 import torch.optim as optim
+from matplotlib import pyplot as plt
 
 import loader
 import helper
@@ -30,12 +31,6 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--transform', default='basic',
                         help='How do you want to transform your input data?')
     parser.add_argument(
-        '-l',
-        '--layers',
-        nargs='+',
-        help='Definition for the Convolutional Neural Network',
-        required=False)
-    parser.add_argument(
         '-d',
         '--dropout',
         default=False,
@@ -54,31 +49,39 @@ if __name__ == "__main__":
         type=int,
         help='Number of Epoches')
     
-    parser.add_argument("-c", "--use-cuda", type=str2bool, default=True)
+    parser.add_argument("-c", "--use-cuda", type=str2bool, default=False)
     
     args = parser.parse_args()
+    want_to_use = False
     
     torch.manual_seed(1)
     
     if torch.cuda.is_available():
         torch.cuda.manual_seed(1)
+
+    if torch.backends.mps.is_available():
+        torch.mps.manual_seed(1)
     
     if args.model == "RN18":
         net_model = model.ResNet_18()
+    elif args.model == "RN18-GPU":
+        want_to_use = True
+        # if we want to use the GPU it must be available
+        if torch.backends.mps.is_available():   
+            net_model = model.ResNet_18(True)
+        else:
+            print("error: your gpu is not available for use")
+            exit(1)
     elif args.model == "RN34":
         net_model = model.ResNet_34()
     elif args.model == "SimpleCNN":
         net_model = model.SimpleCNN()
-    elif args.model == "DeepCNN":
-        layers = args.layers
-        for i in range(len(layers)):
-            try:
-                layers[i] = int(layers[i])
-            except BaseException:
-                pass
-        net_model = model.DeepCNN(arr=layers)
-    
-        print(net_model)
+    elif args.model == "SimpleCNN-GPU":
+        if torch.backends.mps.is_available():   
+            net_model = model.SimpleCNN(True)
+        else:
+            print("error: your gpu is not available for use")
+            exit(1)
         
     num_params = sum(p.numel() for p in net_model.parameters() if p.requires_grad)
     print("There are", num_params, "parameters in this model") 
@@ -90,9 +93,14 @@ if __name__ == "__main__":
     trainloader, validloader = loader.get_data_loader(train_transform, valid_transform, args.batch_size)
     
     use_cuda = torch.cuda.is_available() and args.use_cuda
+    use_mps = torch.backends.mps.is_available() and want_to_use
     
     if use_cuda:
         net_model = net_model.cuda()
+    
+    if use_mps:
+        mps_device = torch.device("mps")
+        net_model = net_model.to(mps_device)
     
     # %%
     train_losses = []
@@ -104,15 +112,20 @@ if __name__ == "__main__":
         learning_rate = max(learning_rate, 1e-6)
         optimizer = optim.SGD(net_model.parameters(), lr=learning_rate, momentum=0.9)
     
-        loss, acc = helper.run("train", trainloader, net_model, optimizer, use_cuda=use_cuda)
+        loss, acc = helper.run("train", trainloader, net_model, optimizer, use_cuda=use_cuda, use_mps=use_mps)
         train_losses.append(loss)
         train_accs.append(acc)
         with torch.no_grad():
-            loss, acc = helper.run("valid", validloader, net_model, use_cuda=use_cuda)
+            loss, acc = helper.run("valid", validloader, net_model, use_cuda=use_cuda, use_mps=use_mps)
             valid_losses.append(loss)
             valid_accs.append(acc)
     
     print("-"*60)
     print("best validation accuracy is %.4f percent" % (np.max(valid_accs) * 100) )
     
-    torch.save(net_model, "model/%s.pt" % args.model)  # save the model for future reference
+    # torch.save(net_model, "models/%s.pt" % args.model)  # save the model for future reference
+
+    plt.plot(train_losses)
+    plt.plot(valid_losses)
+    plt.legend(["training loss", "validation loss"])
+    plt.show()
