@@ -12,13 +12,15 @@ from matplotlib import pyplot as plt
 import model
 import loader
 
-
 # boolean for if you want to use mps to speed things up
-want_to_use = False
+want_to_use = True
 use_mps = torch.backends.mps.is_available() and want_to_use
 
+cnn = torch.load("models/RN18-GPU.pt")
+cnn.eval()
+
 if use_mps:
-        mps_device = torch.device("mps")
+    mps_device = torch.device("mps")
 
 def process_image():
     global img_tk
@@ -56,9 +58,6 @@ def process_image():
     predicted label: {predicted}
     name: {ndf.loc[predicted,'class']}"""
     label_var.set(value=val)
-
-cnn = torch.load("models/RN18.pt")
-cnn.eval()
 
 # randomly shuffle the indicies for the images in the csv file
 num_of_images = 1250

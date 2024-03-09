@@ -52,7 +52,6 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--use-cuda", type=str2bool, default=False)
     
     args = parser.parse_args()
-    want_to_use = False
     
     torch.manual_seed(1)
     
@@ -65,7 +64,7 @@ if __name__ == "__main__":
     if args.model == "RN18":
         net_model = model.ResNet_18()
     elif args.model == "RN18-GPU":
-        want_to_use = True
+        use_mps = True
         # if we want to use the GPU it must be available
         if torch.backends.mps.is_available():   
             net_model = model.ResNet_18(True)
@@ -77,6 +76,7 @@ if __name__ == "__main__":
     elif args.model == "SimpleCNN":
         net_model = model.SimpleCNN()
     elif args.model == "SimpleCNN-GPU":
+        use_mps = True
         if torch.backends.mps.is_available():   
             net_model = model.SimpleCNN(True)
         else:
@@ -93,7 +93,6 @@ if __name__ == "__main__":
     trainloader, validloader = loader.get_data_loader(train_transform, valid_transform, args.batch_size)
     
     use_cuda = torch.cuda.is_available() and args.use_cuda
-    use_mps = torch.backends.mps.is_available() and want_to_use
     
     if use_cuda:
         net_model = net_model.cuda()
@@ -108,6 +107,7 @@ if __name__ == "__main__":
     train_accs = []
     valid_accs = []
     for epoch in range(args.epoch):  # loop over the dataset multiple times
+        print(f'epoch: {epoch + 1} / {args.epoch}')
         learning_rate = 0.01 * 0.8 ** epoch
         learning_rate = max(learning_rate, 1e-6)
         optimizer = optim.SGD(net_model.parameters(), lr=learning_rate, momentum=0.9)
@@ -123,9 +123,21 @@ if __name__ == "__main__":
     print("-"*60)
     print("best validation accuracy is %.4f percent" % (np.max(valid_accs) * 100) )
     
-    # torch.save(net_model, "models/%s.pt" % args.model)  # save the model for future reference
+    torch.save(net_model, "models/%s.pt" % args.model)  # save the model for future reference
 
-    plt.plot(train_losses)
-    plt.plot(valid_losses)
-    plt.legend(["training loss", "validation loss"])
-    plt.show()
+    # # plots two figures with loss and accuracy (still not working)
+    # fig, axs = plt.subplots(1, 2)
+
+    # axs[0].xlabel("epoch")
+    # axs[0].ylabel("loss")
+    # axs[0].plot(train_losses)
+    # axs[0].plot(valid_losses)
+    # axs[0].legend(["training loss", "validation loss"])
+
+    # axs[1].xlabel("epoch")
+    # axs[1].ylabel("accuracy")
+    # axs[1].plot(train_accs)
+    # axs[1].plot(valid_accs)
+    # axs[1].legend(["training accuracy", "validation accuracy"])
+
+    # plt.show()
