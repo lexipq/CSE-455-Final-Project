@@ -1,13 +1,16 @@
 # testing the saved model
+import tqdm
 import torch
 import random
+import numpy as np
 import pandas as pd
 import tkinter as tk
 import torch.utils.data
 from PIL import Image, ImageTk
+from matplotlib import pyplot as plt
 
 import model
-# import loader
+import loader
 
 def process_image():
     global img_tk
@@ -45,7 +48,7 @@ def process_image():
 
 cnn = torch.load("models/RN18.pt")
 cnn.eval()
-    
+
 # randomly shuffle the indicies for the images in the csv file
 num_of_images = 1250
 idxs = [x for x in range(0, num_of_images)]
@@ -77,20 +80,25 @@ process_image()
 window.mainloop()
 
 # code to test training accuracy
-# data = loader.ImgDataSet("test.csv", transformer=model.basic_transformer)
-# dataloader = torch.utils.data.DataLoader(data, batch_size=1, shuffle=True)
+data = loader.ImgDataSet("csv_files/test.csv", transformer=model.basic_transformer)
+dataloader = torch.utils.data.DataLoader(data, batch_size=32, shuffle=True)
 
-# predictions = []
-# actual_labels = []
+predictions = []
+actual_labels = []
 
-# for inputs, labels in tqdm.tqdm(dataloader):
-#         outputs = cnn(inputs)
-#         _, pred = torch.max(outputs, dim=1)
-#         actual_labels += labels.view(-1).cpu().numpy().tolist()
-#         predictions += pred.view(-1).cpu().numpy().tolist()
+for inputs, labels in tqdm.tqdm(dataloader):
+        outputs = cnn(inputs)
+        _, pred = torch.max(outputs, dim=1)
+        actual_labels += labels.view(-1).cpu().numpy().tolist()
+        predictions += pred.view(-1).cpu().numpy().tolist()
 
-# print("actual labels: ", actual_labels)
-# print("predicted labels: ", predictions)   
-# acc = np.sum(np.array(actual_labels) == np.array(
-#         predictions)) / len(actual_labels)
-# print("testing accuracy:", (acc * 100))
+acc = np.sum(np.array(actual_labels) == np.array(
+        predictions)) / len(actual_labels)
+print("testing accuracy:", (acc * 100))
+
+# code for plotting visualization window (still work in progress)
+plt.xlabel('predicted label')
+plt.ylabel('actual label')
+plt.title(f"testing accuracy: {(acc * 100)}%")
+plt.scatter(predictions, actual_labels)
+plt.show()

@@ -115,4 +115,4 @@ if __name__ == "__main__":
     print("-"*60)
     print("best validation accuracy is %.4f percent" % (np.max(valid_accs) * 100) )
     
-    torch.save(net_model, "%s.pt" % args.model)  # save the model for future reference
+    torch.save(net_model, "model/%s.pt" % args.model)  # save the model for future reference
