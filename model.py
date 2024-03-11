@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from torchvision import transforms
 
 basic_transformer = transforms.Compose([transforms.Resize((150,150)), transforms.ToTensor()])
+aug_transformer = transforms.Compose([transforms.Resize((150,150)), transforms.ToTensor(), transforms.RandomHorizontalFlip(), transforms.RandomAffine(5, shear=10)])
 
 class SimpleCNN(nn.Module):
     def __init__(self, use_mps=False):

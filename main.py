@@ -52,6 +52,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--use-cuda", type=str2bool, default=False)
     
     args = parser.parse_args()
+    use_mps = False
     
     torch.manual_seed(1)
     
@@ -89,6 +90,9 @@ if __name__ == "__main__":
     print("Use %s transformer for training" % args.transform)
     if args.transform == "basic":
         train_transform = valid_transform = model.basic_transformer
+    elif args.transform == "aug":
+        train_transform = model.aug_transformer
+        valid_transform = model.basic_transformer
     
     trainloader, validloader = loader.get_data_loader(train_transform, valid_transform, args.batch_size)
     
@@ -125,19 +129,19 @@ if __name__ == "__main__":
     
     torch.save(net_model, "models/%s.pt" % args.model)  # save the model for future reference
 
-    # # plots two figures with loss and accuracy (still not working)
-    # fig, axs = plt.subplots(1, 2)
+    # plots two figures with loss and accuracy (still not working)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
 
-    # axs[0].xlabel("epoch")
-    # axs[0].ylabel("loss")
-    # axs[0].plot(train_losses)
-    # axs[0].plot(valid_losses)
-    # axs[0].legend(["training loss", "validation loss"])
+    ax1.set_xlabel("epoch")
+    ax1.set_ylabel("loss")
+    ax1.plot(train_losses)
+    ax1.plot(valid_losses)
+    ax1.legend(["training loss", "validation loss"])
 
-    # axs[1].xlabel("epoch")
-    # axs[1].ylabel("accuracy")
-    # axs[1].plot(train_accs)
-    # axs[1].plot(valid_accs)
-    # axs[1].legend(["training accuracy", "validation accuracy"])
+    ax2.set_xlabel("epoch")
+    ax2.set_ylabel("accuracy")
+    ax2.plot(train_accs)
+    ax2.plot(valid_accs)
+    ax2.legend(["training accuracy", "validation accuracy"])
 
-    # plt.show()
+    plt.show()
