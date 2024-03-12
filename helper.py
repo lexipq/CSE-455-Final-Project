@@ -15,6 +15,11 @@ def run(mode, dataloader, model, optimizer=None, use_cuda=False, use_mps=False):
     actual_labels = []
     predictions = []
 
+    if mode == "valid":
+        model.eval()
+    else:
+        model.train()
+
     for inputs, labels in tqdm.tqdm(dataloader):
         if use_cuda:
             inputs, labels = inputs.cuda(), labels.cuda()
